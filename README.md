@@ -1,21 +1,18 @@
-# `supabase-js`
+# `supabase-wechat-stable-v2`
 
-[![Coverage Status](https://coveralls.io/repos/github/supabase/supabase-js/badge.svg?branch=master)](https://coveralls.io/github/supabase/supabase-js?branch=master)
 
-An isomorphic JavaScript client for Supabase.
+一个用于Supabase的同构的微信客户端。
 
-- **Documentation:** https://supabase.com/docs/reference
-- TypeDoc: https://supabase.github.io/supabase-js/v2/
 
 ## Usage
 
-First of all, you need to install the library:
+首先，你需要安装这个库。
 
 ```sh
 npm install supabase-wechat-stable-v2
 ```
 
-Then you're able to import the library and establish the connection with the database:
+然后你就可以导入库并与数据库建立连接。
 
 ```js
 import { createClient } from 'supabase-wechat-stable-v2'
@@ -23,46 +20,16 @@ import { createClient } from 'supabase-wechat-stable-v2'
 // Create a single supabase client for interacting with your database
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 ```
-
-### UMD
-
-You can now use plain `<script>`s to import supabase-js from CDNs, like:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/supabase-wechat-stable-v2"></script>
-```
-
-or even:
-
-```html
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
-```
-
-Then you can use it from a global `supabase` variable:
-
-```html
-<script>
-  const { createClient } = supabase
-  const _supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-
-  console.log('Supabase Instance: ', _supabase)
-  // ...
-</script>
-```
-
-
-
+查询数据(举例)
 
 ```js
-import { createClient } from 'supabase-wechat-stable-v2'
 
-// Provide a custom `fetch` implementation as an option
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
-  global: {
-    fetch: (...args) => fetch(...args),
-  },
-})
+const { data, error } = await supabase
+  .from('countries')
+  .select()
+
 ```
+
 
 ## Sponsors
 
