@@ -98,7 +98,7 @@ export default class StorageFileApi {
       // const _path = this._getFinalPath(cleanPath)
       const cleanPath = this._removeEmptyFolders(path)
       const _path = this._getFinalPath(cleanPath)
-      const FormData = myFetch.formData
+      const FormData = require('../lib/formData.js')
       let formData = new FormData()
       formData.append('name', 'value')
       formData.appendFile('file', fileBody.tempFilePath, path)
