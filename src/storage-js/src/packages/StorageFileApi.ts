@@ -392,7 +392,7 @@ export default class StorageFileApi {
         headers: this.headers,
         noResolveJson: true,
       })
-      const data = await res.blob()
+      const data = await res
       return { data, error: null }
     } catch (error) {
       if (isStorageError(error)) {

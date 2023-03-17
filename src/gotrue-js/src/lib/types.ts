@@ -49,7 +49,6 @@ export type GoTrueClientOptions = {
   /* A custom fetch implementation. */
   fetch?: Fetch
 }
-
 export type AuthResponse =
   | {
       data: {
@@ -227,7 +226,9 @@ export interface User {
   role?: string
   updated_at?: string
   identities?: UserIdentity[]
-  factors?: Factor[]
+  factors?: Factor[],
+  wechat_id?: string,
+  wechat_unionid?: string,
 }
 
 export interface UserAttributes {
@@ -324,7 +325,33 @@ export interface Subscription {
 export interface UpdatableFactorAttributes {
   friendlyName: string
 }
+export type unlimitedQRCodeCredentials = | {
+  /** The wechat login code */
+  page?: string,
+  scene:string,
+  check_path?:boolean,
+  env_version?:string,
+  width?:number,
+  auto_color?:boolean,
+  line_color?:object,
+  is_hyaline?:boolean
 
+}
+export type WechatBindPhoneCredentials = | {
+  /** The wechat bindphone code */
+  code: string
+
+}
+export type WechatBindAccountCredentials =
+| {
+  /** The wechat BindAccount code. */
+  code: string
+}
+export type SignInWithWechatCredentials  =
+  | {
+    /** The wechat login code. */
+    code: string
+  }
 export type SignUpWithPasswordCredentials =
   | {
       /** The user's email address. */

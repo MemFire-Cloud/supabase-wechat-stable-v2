@@ -47,7 +47,11 @@ import type {
   SignInWithPasswordCredentials,
   SignInWithPasswordlessCredentials,
   SignInWithSSO,
+  WechatBindPhoneCredentials,
+  WechatBindAccountCredentials,
+  unlimitedQRCodeCredentials,
   SignUpWithPasswordCredentials,
+  SignInWithWechatCredentials,
   Subscription,
   SupportedStorage,
   User,
@@ -226,7 +230,151 @@ export default class GoTrueClient {
       await this._handleVisibilityChange()
     }
   }
+  /**
+     * wechat login
+     *
+     */
+ async signInWithWechat(credentials: SignInWithWechatCredentials): Promise<AuthResponse>{
+  try {
+    await this._removeSession()
+    let res: AuthResponse
+    if ('code' in credentials) {
+      const { code } = credentials
+      res = await _request(this.fetch, 'GET', `${this.url}/wechat_mini/login?code=${code}`, {
+          headers: this.headers,
+          body: {
+            code
+          },
+          xform: _sessionResponse,
+        })
+    } else {
+      throw new AuthInvalidCredentialsError(
+        'code是必填项'
+      )
+    }
+    const { data, error } = res
+    if (error || !data) return { data: { user: null, session: null }, error }
+    if (data.session) {
+      await this._saveSession(data.session)
+      this._notifyAllSubscribers('SIGNED_IN', data.session)
+    }
+    return { data, error }
+  } catch (error) {
+    if (isAuthError(error)) {
+      return { data: { user: null, session: null }, error }
+    }
+    throw error
+  }
+  }
+  /**
+   * wechat get phone
+   *
+   */
+    async wechatBindPhone(credentials: WechatBindPhoneCredentials) {
+    try {
+        const { data: sessionData, error: sessionError } = await this.getSession()
+        if (sessionError) {
+            throw sessionError
+        }
+        if (!sessionData.session) {
+            throw new AuthSessionMissingError()
+        }
+        const session: Session = sessionData.session
+        if ('code' in credentials) {
+            const { code } = credentials
+            const { data, error: userError } = await _request(this.fetch, 'GET', `${this.url}/wechat_mini/bind_phone?code=${code}`, {
+                headers: this.headers,
+                jwt: session.access_token,
+                xform: _userResponse,
+              })
+            if (userError) throw userError
+            session.user = data.user as User
+        } else {
+            throw new AuthInvalidCredentialsError(
+            'code是必填项'
+            )
+        }
+        await this._saveSession(session)
+        // this._notifyAllSubscribers('USER_UPDATED', session)
+        return { data: { user: session.user }, error: null }
+    } catch (error) {
+        if (isAuthError(error)) {
+        return { data: { user: null }, error }
+      }
 
+      throw error
+    }
+  }
+  /**
+   * wechat bind account
+   *
+   */
+  async wechatBindAccount(credentials: WechatBindAccountCredentials) {
+    try {
+      const { data: sessionData, error: sessionError } = await this.getSession()
+      if (sessionError) {
+          throw sessionError
+      }
+      if (!sessionData.session) {
+          throw new AuthSessionMissingError()
+      }
+      const session: Session = sessionData.session
+      if ('code' in credentials) {
+          const { code } = credentials
+          const { data, error: userError } = await _request(this.fetch, 'GET', `${this.url}/wechat_mini/bind_account?code=${code}`, {
+              headers: this.headers,
+              jwt: session.access_token,
+              xform: _userResponse,
+           })
+          if (userError) throw userError
+          session.user = data.user as User
+      } else {
+          throw new AuthInvalidCredentialsError(
+          'code是必填项'
+          )
+      }
+      await this._saveSession(session)
+      // this._notifyAllSubscribers('USER_UPDATED', session)
+      return { data: { user: session.user }, error: null }
+  } catch (error) {
+      if (isAuthError(error)) {
+      return { data: { user: null }, error }
+    }
+
+    throw error
+  }
+  }
+  /**
+  * wechat get  QRcode
+  *
+  */
+  async getUnlimitedQRCode(credentials: unlimitedQRCodeCredentials) {
+    try {
+      let res;
+      const { page, scene, check_path, env_version, width, auto_color, line_color, is_hyaline } = credentials
+      res = await _request(this.fetch, 'POST', `${this.url}/wechat_mini/unlimited_qrcode`, {
+        headers: this.headers,
+        // xform: _sessionResponse,
+        body: {
+            page,
+            scene,
+            check_path,
+            env_version,
+            width,
+            auto_color,
+            line_color,
+            is_hyaline
+        },
+      })
+      const { data, error } = res
+      if (error || !data) {
+        return { data: { imgBase64: null } , error: error }
+      }
+      return { data: { imgBase64: data?.data?.imgBase64 }, error: null }
+    } catch (error) {
+        return { data: { imgBase64: null }, error:error }
+    }
+  }
   /**
    * Creates a new user.
    *
@@ -511,23 +659,23 @@ export default class GoTrueClient {
    */
   async getSession(): Promise<
     | {
-        data: {
-          session: Session
-        }
-        error: null
+      data: {
+        session: Session
       }
+      error: null
+    }
     | {
-        data: {
-          session: null
-        }
-        error: AuthError
+      data: {
+        session: null
       }
+      error: AuthError
+    }
     | {
-        data: {
-          session: null
-        }
-        error: null
+      data: {
+        session: null
       }
+      error: null
+    }
   > {
     // make sure we've read the session from the url if there is one
     // save to just await, as long we make sure _initialize() never throws
@@ -749,9 +897,9 @@ export default class GoTrueClient {
    */
   private async _getSessionFromUrl(): Promise<
     | {
-        data: { session: Session; redirectType: string | null }
-        error: null
-      }
+      data: { session: Session; redirectType: string | null }
+      error: null
+    }
     | { data: { session: null; redirectType: null }; error: AuthError }
   > {
     try {
@@ -886,9 +1034,9 @@ export default class GoTrueClient {
     } = {}
   ): Promise<
     | {
-        data: {}
-        error: null
-      }
+      data: {}
+      error: null
+    }
     | { data: null; error: AuthError }
   > {
     try {
