@@ -520,6 +520,11 @@ function onParseComplete(
   ctx.path = path
   ctx.query = query
   ctx.fragment = fragment
+  if (host.includes(':')) {
+    ctx.host = host.substring(0, host.lastIndexOf(':'))
+  } else {
+    ctx.host = host
+  }
   ctx.host = host
   ctx.href = href
   ctx.pathname = pathname
