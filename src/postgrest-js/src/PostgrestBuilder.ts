@@ -85,14 +85,14 @@ export default abstract class PostgrestBuilder<Result>
           if (body === '') {
             // Prefer: return=minimal
           } else if (this.headers['Accept'] === 'text/csv') {
-            data = body
+            data = body.data
           } else if (
             this.headers['Accept'] &&
             this.headers['Accept'].includes('application/vnd.pgrst.plan+text')
           ) {
-            data = body
+            data = body.data
           } else {
-            data = body
+            data = body.data
           }
         }
 
