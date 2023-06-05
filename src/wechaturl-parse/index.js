@@ -525,7 +525,6 @@ function onParseComplete(
   } else {
     ctx.host = host
   }
-  ctx.host = host
   ctx.href = href
   ctx.pathname = pathname
 
