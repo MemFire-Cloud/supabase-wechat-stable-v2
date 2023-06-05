@@ -85,12 +85,12 @@ export default abstract class PostgrestBuilder<Result>
           if (body === '') {
             // Prefer: return=minimal
           } else if (this.headers['Accept'] === 'text/csv') {
-            data = body.data
+            data = body
           } else if (
             this.headers['Accept'] &&
             this.headers['Accept'].includes('application/vnd.pgrst.plan+text')
           ) {
-            data = body.data
+            data = body
           } else {
             data = body.data
           }
@@ -105,7 +105,7 @@ export default abstract class PostgrestBuilder<Result>
         const body = res
 
         try {
-          error = body
+          error = body.data
 
           // Workaround for https://github.com/supabase/postgrest-js/issues/295
           if (Array.isArray(error) && res.status === 404) {
