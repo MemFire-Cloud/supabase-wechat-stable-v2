@@ -18,11 +18,7 @@ export {
 export * from './realtime-js/src/index'
 export { default as SupabaseClient } from './SupabaseClient'
 export type { SupabaseClientOptions } from './lib/types'
-// import myfetch from './memfireFetch/index'
-// import { myFetch } from " memfirefetch ";
 import myfetch from './wefetch'
-// const myfetch = require('memfireFetch');
-// const wefetch = require('wefetch');
 
 /**
  * Creates a new Supabase Client.

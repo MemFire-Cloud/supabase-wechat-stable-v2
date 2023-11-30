@@ -5,11 +5,18 @@ import { resolveFetch } from '../lib/helpers'
 import { Bucket } from '../lib/types'
 
 export default class StorageBucketApi {
+  protected supabaseKey: string
   protected url: string
   protected headers: { [key: string]: string }
   protected fetch: Fetch
 
-  constructor(url: string, headers: { [key: string]: string } = {}, fetch?: Fetch) {
+  constructor(
+    supabaseKey: string,
+    url: string,
+    headers: { [key: string]: string } = {},
+    fetch?: Fetch
+  ) {
+    this.supabaseKey = supabaseKey
     this.url = url
     this.headers = { ...DEFAULT_HEADERS, ...headers }
     this.fetch = resolveFetch(fetch)

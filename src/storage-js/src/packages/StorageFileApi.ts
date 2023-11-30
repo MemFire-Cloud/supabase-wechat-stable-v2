@@ -25,17 +25,20 @@ const DEFAULT_FILE_OPTIONS: FileOptions = {
 }
 
 export default class StorageFileApi {
+  protected supabaseKey: string | undefined
   protected url: string
   protected headers: { [key: string]: string }
   protected bucketId?: string
   protected fetch: Fetch
 
   constructor(
+    supabaseKey: string,
     url: string,
     headers: { [key: string]: string } = {},
     bucketId?: string,
     fetch?: Fetch
   ) {
+    this.supabaseKey = supabaseKey
     this.url = url
     this.headers = headers
     this.bucketId = bucketId
@@ -81,7 +84,6 @@ export default class StorageFileApi {
         ...this.headers,
         ...(method === 'POST' && { 'x-upsert': String(options.upsert as boolean) }),
       }
-
       // if (typeof Blob !== 'undefined' && fileBody instanceof Blob) {
       //   body = new FormData()
       //   body.append('cacheControl', options.cacheControl as string)
@@ -127,6 +129,68 @@ export default class StorageFileApi {
       throw error
     }
   }
+  /**
+   * app_Uploads a file to an existing bucket or replaces an existing file at the specified path with a new one.
+   *
+   * @param method HTTP method.
+   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param fileBody The body of the file to be stored in the bucket.
+   */
+  private async app_upload(
+    method: 'POST',
+    path: string,
+    fileBody:
+      | ArrayBuffer
+      | ArrayBufferView
+      | Blob
+      | Buffer
+      | File
+      | FormData
+      | NodeJS.ReadableStream
+      | ReadableStream<Uint8Array>
+      | URLSearchParams
+      | string,
+    fileOptions?: FileOptions
+  ): Promise<
+    | {
+        data: { path: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
+    try {
+      const options = { ...DEFAULT_FILE_OPTIONS, ...fileOptions }
+      const headers: Record<string, string> = {
+        ...this.headers,
+        ...(method === 'POST' && { 'x-upsert': String(options.upsert as boolean) }),
+      }
+      headers.Authorization = `Bearer ${this.supabaseKey}`
+      const cleanPath = this._removeEmptyFolders(path)
+      const _path = this._getFinalPath(cleanPath)
+
+      return new Promise((resolve, reject) => {
+        uni.uploadFile({
+          url: `${this.url}/object/${_path}`, // 仅为示例，非真实的接口地址
+          filePath: fileBody,
+          header: headers,
+          success: (uploadFileRes: any) => {
+            resolve({ data: { path: cleanPath }, error: null })
+          },
+          fail: (err: any) => {
+            reject({ data: null, error: err })
+          },
+        })
+      })
+    } catch (error) {
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+      throw error
+    }
+  }
 
   /**
    * Uploads a file to an existing bucket.
@@ -160,7 +224,38 @@ export default class StorageFileApi {
   > {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
-
+  /**
+   * app_Uploads a file to an existing bucket.
+   *
+   * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param fileBody The body of the file to be stored in the bucket.
+   */
+  async unapp_upload(
+    path: string,
+    fileBody:
+      | ArrayBuffer
+      | ArrayBufferView
+      | Blob
+      | Buffer
+      | File
+      | FormData
+      | NodeJS.ReadableStream
+      | ReadableStream<Uint8Array>
+      | URLSearchParams
+      | string,
+    fileOptions?: FileOptions
+  ): Promise<
+    | {
+        data: { path: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
+    return this.app_upload('POST', path, fileBody, fileOptions)
+  }
   /**
    * Replaces an existing file at the specified path with a new one.
    *
@@ -193,7 +288,6 @@ export default class StorageFileApi {
   > {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
-
   /**
    * Moves an existing file to a new path in the same bucket.
    *
