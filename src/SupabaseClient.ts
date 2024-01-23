@@ -1,19 +1,19 @@
-import { FunctionsClient } from '@supabase/functions-js'
-import { AuthChangeEvent } from '@supabase/gotrue-js'
-import { PostgrestClient } from '@supabase/postgrest-js'
+import { FunctionsClient } from './functions-js/src/index'
+import { AuthChangeEvent } from './gotrue-js/src/index'
+import { PostgrestClient } from './postgrest-js/src/index'
 import {
   RealtimeChannel,
   RealtimeChannelOptions,
   RealtimeClient,
   RealtimeClientOptions,
-} from '@supabase/realtime-js'
-import { StorageClient as SupabaseStorageClient } from '@supabase/storage-js'
+} from './realtime-js/src/index'
+import { StorageClient as SupabaseStorageClient } from './storage-js/src/index'
 import { DEFAULT_HEADERS } from './lib/constants'
 import { fetchWithAuth } from './lib/fetch'
 import { stripTrailingSlash, applySettingDefaults } from './lib/helpers'
 import { SupabaseAuthClient } from './lib/SupabaseAuthClient'
 import { Fetch, GenericSchema, SupabaseClientOptions, SupabaseAuthClientOptions } from './lib/types'
-
+let { URL } = require('./wechaturl-parse/index')
 const DEFAULT_GLOBAL_OPTIONS = {
   headers: DEFAULT_HEADERS,
 }

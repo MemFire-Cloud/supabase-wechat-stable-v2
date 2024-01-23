@@ -1,7 +1,7 @@
 {
-  "name": "@supabase/supabase-js",
-  "version": "0.0.0-automated",
-  "description": "Isomorphic Javascript client for Supabase",
+  "name": "supabase-wechat-stable-v2",
+  "version": "2.1.5",
+  "description": "wechat Javascript client for Supabase",
   "keywords": [
     "javascript",
     "typescript",
@@ -17,6 +17,7 @@
   ],
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
+  "miniprogram": "./dist/main",
   "types": "dist/module/index.d.ts",
   "sideEffects": false,
   "repository": "supabase/supabase-js",
@@ -37,12 +38,7 @@
     "docs:json": "typedoc --entryPoints src/index.ts --includes src/**/*.ts --json docs/v2/spec.json --excludeExternals"
   },
   "dependencies": {
-    "@supabase/functions-js": "^2.1.5",
-    "@supabase/gotrue-js": "^2.60.0",
-    "@supabase/node-fetch": "^2.6.14",
-    "@supabase/postgrest-js": "^1.9.0",
-    "@supabase/realtime-js": "^2.9.3",
-    "@supabase/storage-js": "^2.5.4"
+    "phoenix": "^1.6.16"
   },
   "devDependencies": {
     "@types/jest": "^29.2.5",

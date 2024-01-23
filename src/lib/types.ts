@@ -1,6 +1,6 @@
-import { GoTrueClient } from '@supabase/gotrue-js'
-import { RealtimeClientOptions } from '@supabase/realtime-js'
-import { PostgrestError } from '@supabase/postgrest-js'
+import { GoTrueClient } from '../gotrue-js/src/index'
+import { RealtimeClientOptions } from '../realtime-js/src/index'
+import { PostgrestError } from '../postgrest-js/src/index'
 
 type GoTrueClientOptions = ConstructorParameters<typeof GoTrueClient>[0]
 

@@ -1,21 +1,21 @@
 import SupabaseClient from './SupabaseClient'
 import type { GenericSchema, SupabaseClientOptions } from './lib/types'
-
-export * from '@supabase/gotrue-js'
-export type { User as AuthUser, Session as AuthSession } from '@supabase/gotrue-js'
+import myfetch from './wefetch'
+export * from './gotrue-js/src/index'
+export type { User as AuthUser, Session as AuthSession } from './gotrue-js/src/index'
 export type {
   PostgrestResponse,
   PostgrestSingleResponse,
   PostgrestMaybeSingleResponse,
   PostgrestError,
-} from '@supabase/postgrest-js'
+} from './postgrest-js/src/index'
 export {
   FunctionsHttpError,
   FunctionsFetchError,
   FunctionsRelayError,
   FunctionsError,
-} from '@supabase/functions-js'
-export * from '@supabase/realtime-js'
+} from './functions-js/src/index'
+export * from './realtime-js/src/index'
 export { default as SupabaseClient } from './SupabaseClient'
 export type { SupabaseClientOptions, QueryResult, QueryData, QueryError } from './lib/types'
 
@@ -35,5 +35,11 @@ export const createClient = <
   supabaseKey: string,
   options?: SupabaseClientOptions<SchemaName>
 ): SupabaseClient<Database, SchemaName, Schema> => {
-  return new SupabaseClient(supabaseUrl, supabaseKey, options)
+  return new SupabaseClient(supabaseUrl, supabaseKey, {
+    ...options,
+    global: {
+      fetch: (...args) => myfetch(...args),
+      headers: options?.global?.headers || {},
+    },
+  })
 }
