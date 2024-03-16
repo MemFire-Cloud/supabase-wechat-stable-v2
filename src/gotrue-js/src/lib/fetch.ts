@@ -171,12 +171,12 @@ export function _sessionResponse(data: any): AuthResponse {
     }
   }
 
-  const user: User = data.user ?? (data as User)
+  const user: User = data.data.user ?? (data as User)
   return { data: { session, user }, error: null }
 }
 
 export function _userResponse(data: any): UserResponse {
-  const user: User = data.user ?? (data as User)
+  const user: User = data.data ?? (data as User)
   return { data: { user }, error: null }
 }
 
